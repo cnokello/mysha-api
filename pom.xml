@@ -4,7 +4,7 @@
 
   <groupId>com.myhealth</groupId>
   <artifactId>myhealth</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>1.0.0</version>
   <packaging>war</packaging>
 
   <name>myHealth</name>
@@ -24,10 +24,18 @@
     <c3p0.version>0.9.1.2</c3p0.version>
     <kafka.version>0.8.1.1</kafka.version>
     <jmxri.version>1.2.1</jmxri.version>
+    <commons-lang.version>2.4</commons-lang.version>
   </properties>
 
   <dependencies>
   
+    <dependency>
+        <groupId>commons-lang</groupId>
+        <artifactId>commons-lang</artifactId>
+        <version>${commons-lang.version}</version>
+        <type>jar</type>
+    </dependency>
+        
     <dependency>
         <groupId>org.apache.cxf</groupId>
         <artifactId>cxf-rt-frontend-jaxrs</artifactId>

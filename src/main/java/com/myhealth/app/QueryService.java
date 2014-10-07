@@ -1,16 +1,32 @@
 package com.myhealth.app;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
+import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.myhealth.dao.MyHealthDAO;
 import com.myhealth.model.DashboardElement;
+import com.myhealth.model.Disease;
+import com.myhealth.model.Doctor;
+import com.myhealth.model.Drug;
+import com.myhealth.model.HealthClub;
+import com.myhealth.model.Hospital;
+import com.myhealth.model.InsuranceCompany;
+import com.myhealth.model.InsuranceCoverageDoctor;
+import com.myhealth.model.InsuranceCoverageHospital;
 import com.myhealth.model.Item;
+import com.myhealth.model.Nurse;
+import com.myhealth.model.Nutritionist;
+import com.myhealth.model.PersonalTrainer;
 import com.myhealth.model.Topic;
 import com.myhealth.model.User;
+import com.myhealth.model.UserAccess;
 
 /**
  * The query model
@@ -21,23 +37,179 @@ import com.myhealth.model.User;
 @Service(value = "queryService")
 public class QueryService {
 
+  private static final Logger LOGGER = Logger.getLogger(QueryService.class);
+
   private @Autowired
   MyHealthDAO myHealthDAO;
+
+  public Set<Disease> getDiseases(final int page, final int offset) {
+    Set<Disease> diseases = new HashSet<Disease>();
+    try {
+      diseases = myHealthDAO.getDiseases(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return diseases;
+  }
+
+  public Set<Drug> getDrugs(final int page, final int offset) {
+    Set<Drug> drugs = new HashSet<Drug>();
+    try {
+      drugs = myHealthDAO.getDrugs(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return drugs;
+  }
+
+  public Set<InsuranceCoverageDoctor> getInsuranceCoverageDoctors(final int page, final int offset) {
+    Set<InsuranceCoverageDoctor> doctors = new HashSet<InsuranceCoverageDoctor>();
+    try {
+      doctors = myHealthDAO.getInsuranceCoverageDoctors(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return doctors;
+  }
+
+  public Set<InsuranceCoverageHospital> getInsuranceCoverageHospitals(final int page,
+      final int offset) {
+    Set<InsuranceCoverageHospital> hospitals = new HashSet<InsuranceCoverageHospital>();
+    try {
+      hospitals = myHealthDAO.getInsuranceCoverageHospitals(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return hospitals;
+  }
+
+  public Set<InsuranceCompany> getInsuranceCompanies(final int page, final int offset) {
+    Set<InsuranceCompany> companies = new HashSet<InsuranceCompany>();
+    try {
+      companies = myHealthDAO.getInsuranceCompanies(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return companies;
+  }
+
+  public Set<HealthClub> getHealthClubs(final int page, final int offset) {
+    Set<HealthClub> clubs = new HashSet<HealthClub>();
+    try {
+      clubs = myHealthDAO.getHealthClubs(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return clubs;
+  }
+
+  public Set<Hospital> getHospitals(final int page, final int offset) {
+    Set<Hospital> hospitals = new HashSet<Hospital>();
+    try {
+      hospitals = myHealthDAO.getHospitals(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return hospitals;
+  }
+
+  public Set<Nutritionist> getNutritionists(final int page, final int offset) {
+    Set<Nutritionist> nutritionists = new HashSet<Nutritionist>();
+    try {
+      nutritionists = myHealthDAO.getNutritionists(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return nutritionists;
+  }
+
+  public Set<PersonalTrainer> getPersonalTrainers(final int page, final int offset) {
+    Set<PersonalTrainer> personalTrainers = new HashSet<PersonalTrainer>();
+    try {
+      personalTrainers = myHealthDAO.getPersonalTrainers(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return personalTrainers;
+  }
+
+  /**
+   * 
+   * @param page
+   * @param offset
+   * @return
+   */
+  public Set<Nurse> getNurses(final int page, final int offset) {
+    Set<Nurse> nurses = new HashSet<Nurse>();
+    try {
+      nurses = myHealthDAO.getNurses(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return nurses;
+  }
+
+  /**
+   * 
+   * @param page
+   * @param offset
+   * @return
+   */
+  public Set<Doctor> getDoctors(final int page, final int offset) {
+    Set<Doctor> doctors = new HashSet<Doctor>();
+    try {
+      doctors = myHealthDAO.getDoctors(page, offset);
+
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return doctors;
+  }
 
   /**
    * Performs authentication
    * 
    * @return Returns the logged on user
    */
-  public User login(final String username, final String password, final String imei) {
+  public Map<String, Object> login(final String username, final String password, final String imei) {
     User u = null;
+    Map<String, Object> userDetails = new HashMap<String, Object>();
+
     try {
       u = myHealthDAO.getUserByUsername(username);
+      if (u.getId() > 0) {
+        userDetails.put("details", u);
+        UserAccess access = new UserAccess(u.getId());
+        userDetails.put("access", access);
+
+      }
 
     } catch (Exception e) {
     }
 
-    return u;
+    return userDetails;
   }
 
   /**

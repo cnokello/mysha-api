@@ -9,8 +9,8 @@
   <classpathentry kind="var" path="M2_REPO/javax/servlet/servlet-api/2.5/servlet-api-2.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/mail/mail/1.4/mail-1.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/javax/activation/activation/1.1/activation-1.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/javax/jms/jms/1.1/jms-1.1.jar"/>
   <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/commons-lang/commons-lang/2.4/commons-lang-2.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/cxf/cxf-rt-frontend-jaxrs/3.0.0/cxf-rt-frontend-jaxrs-3.0.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/cxf/cxf-core/3.0.0/cxf-core-3.0.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/codehaus/woodstox/woodstox-core-asl/4.3.0/woodstox-core-asl-4.3.0.jar"/>
@@ -18,19 +18,19 @@
   <classpathentry kind="var" path="M2_REPO/org/apache/ws/xmlschema/xmlschema-core/2.1.0/xmlschema-core-2.1.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/cxf/cxf-rt-transports-http/3.0.0/cxf-rt-transports-http-3.0.0.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/cxf/cxf-rt-rs-extension-providers/3.0.0/cxf-rt-rs-extension-providers-3.0.0.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/3.2.4.RELEASE/spring-core-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-core/3.2.4.RELEASE/spring-core-3.2.4.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-core/3.2.4.RELEASE/spring-core-3.2.4.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1.jar">
     <attributes>
       <attribute value="jar:file:/home/nelson.okello/.m2/repository/commons-logging/commons-logging/1.1.1/commons-logging-1.1.1-javadoc.jar!/" name="javadoc_location"/>
     </attributes>
   </classpathentry>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.2.4.RELEASE/spring-web-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-web/3.2.4.RELEASE/spring-web-3.2.4.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-web/3.2.4.RELEASE/spring-web-3.2.4.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0.jar" sourcepath="M2_REPO/aopalliance/aopalliance/1.0/aopalliance-1.0-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/3.2.4.RELEASE/spring-aop-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-aop/3.2.4.RELEASE/spring-aop-3.2.4.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/3.2.4.RELEASE/spring-beans-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-beans/3.2.4.RELEASE/spring-beans-3.2.4.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/3.2.4.RELEASE/spring-context-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-context/3.2.4.RELEASE/spring-context-3.2.4.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-expression/3.2.4.RELEASE/spring-expression-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-expression/3.2.4.RELEASE/spring-expression-3.2.4.RELEASE-sources.jar"/>
-  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/3.2.4.RELEASE/spring-tx-3.2.4.RELEASE.jar" sourcepath="M2_REPO/org/springframework/spring-tx/3.2.4.RELEASE/spring-tx-3.2.4.RELEASE-sources.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-aop/3.2.4.RELEASE/spring-aop-3.2.4.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-beans/3.2.4.RELEASE/spring-beans-3.2.4.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-context/3.2.4.RELEASE/spring-context-3.2.4.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-expression/3.2.4.RELEASE/spring-expression-3.2.4.RELEASE.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/springframework/spring-tx/3.2.4.RELEASE/spring-tx-3.2.4.RELEASE.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jpa/2.0.8/spring-jpa-2.0.8.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-dao/2.0.8/spring-dao-2.0.8.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/springframework/spring-jdbc/2.0.8/spring-jdbc-2.0.8.jar"/>
@@ -59,8 +59,6 @@
   <classpathentry kind="var" path="M2_REPO/org/xerial/snappy/snappy-java/1.0.5/snappy-java-1.0.5.jar"/>
   <classpathentry kind="var" path="M2_REPO/org/apache/zookeeper/zookeeper/3.3.4/zookeeper-3.3.4.jar"/>
   <classpathentry kind="var" path="M2_REPO/log4j/log4j/1.2.15/log4j-1.2.15.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jdmk/jmxtools/1.2.1/jmxtools-1.2.1.jar"/>
-  <classpathentry kind="var" path="M2_REPO/com/sun/jmx/jmxri/1.2.1/jmxri-1.2.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/jline/jline/0.9.94/jline-0.9.94.jar"/>
   <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
   <classpathentry kind="var" path="M2_REPO/net/sf/jopt-simple/jopt-simple/3.2/jopt-simple-3.2.jar"/>

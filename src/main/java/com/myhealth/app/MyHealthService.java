@@ -16,11 +16,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
 import com.myhealth.model.DashboardElement;
+import com.myhealth.model.Disease;
+import com.myhealth.model.Doctor;
+import com.myhealth.model.Drug;
+import com.myhealth.model.HealthClub;
+import com.myhealth.model.Hospital;
+import com.myhealth.model.InsuranceCompany;
+import com.myhealth.model.InsuranceCoverageDoctor;
+import com.myhealth.model.InsuranceCoverageHospital;
 import com.myhealth.model.Item;
+import com.myhealth.model.Nurse;
+import com.myhealth.model.Nutritionist;
+import com.myhealth.model.PersonalTrainer;
 import com.myhealth.model.Topic;
 import com.myhealth.model.User;
 import com.thoughtworks.xstream.XStream;
@@ -34,6 +46,8 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
  */
 @Path("/")
 public class MyHealthService {
+
+  private static final Logger LOGGER = Logger.getLogger(MyHealthService.class);
 
   private @Autowired
   QueryService query;
@@ -61,40 +75,37 @@ public class MyHealthService {
     Map<String, Object> resp = new HashMap<String, Object>();
 
     System.out.println("Authentication request received\n\n");
-    User u = query.login(username, password, imei);
+    Map<String, Object> userDetails = query.login(username, password, imei);
 
-    resp.put("code", 200);
-    resp.put("message", "Request processed successfully");
-    resp.put("user", u);
+    if (userDetails.size() > 0) {
+      resp.put("code", 200);
+      resp.put("message", "Login successful");
+    } else {
+      resp.put("code", 201);
+      resp.put("message", "Login unsuccessful");
+    }
+
+    resp.put("user", userDetails);
 
     // Test Kafka
-    persistenceService.createSocialNetworkAccount(u);
+    // persistenceService.createSocialNetworkAccount(u);
 
     // Handle XML and Json formats
     // If callback is specified
-    Response response = null;
-    if (format != null && format.equals("xml")) {
-      XStream xStream = new XStream(new DomDriver());
-      xStream.alias("login", java.util.Map.class);
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(xStream.toXML(resp)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/xml").entity(xStream.toXML(resp))
-            .build();
-      }
+    return response(resp, format, callback);
+  }
 
-    } else {
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(new Gson().toJson(resp)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/json")
-            .entity(new Gson().toJson(resp)).build();
-      }
-    }
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("/logout")
+  @GET
+  public Response logout(@QueryParam("accessToken") final String accessToken,
+      @QueryParam("format") final String format, @QueryParam("callback") final String callback) {
 
-    return response;
+    Map<String, Object> resp = new HashMap<String, Object>();
+    resp.put("code", 200);
+    resp.put("message", "Login successful");
+
+    return response(resp, format, callback);
   }
 
   /**
@@ -117,7 +128,7 @@ public class MyHealthService {
       @FormParam("socialNetwork") final String socialNetwork,
       @QueryParam("format") final String format, @QueryParam("callback") final String callback) {
 
-    System.out.println("Account creation request received\n\n");
+    LOGGER.info("Account creation request received");
 
     User u = new User(surname, otherNames, username, password, password1, email, mobile, imei,
         socialNetworkToken, socialNetworkSecret, socialNetwork);
@@ -135,30 +146,204 @@ public class MyHealthService {
       resp.put("message", "User creation failed");
     }
 
-    Response response = null;
-    if (format != null && format.equals("xml")) {
-      XStream xStream = new XStream(new DomDriver());
-      xStream.alias("account", java.util.Map.class);
+    return response(resp, format, callback);
+  }
 
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(xStream.toXML(resp)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/xml").entity(xStream.toXML(resp))
-            .build();
-      }
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/personalTrainers")
+  @GET
+  public Response personalTrainers(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
 
-    } else {
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(new Gson().toJson(resp)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/json")
-            .entity(new Gson().toJson(resp)).build();
-      }
-    }
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<PersonalTrainer> personalTrainers = query.getPersonalTrainers(1, 50);
 
-    return response;
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("personalTrainers", personalTrainers);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/diseases")
+  @GET
+  public Response diseases(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Disease> diseases = query.getDiseases(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("diseases", diseases);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/drugs")
+  @GET
+  public Response drugs(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Drug> drugs = query.getDrugs(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("drugs", drugs);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/insuranceCoverageDoctors")
+  @GET
+  public Response insuranceCoverageDoctors(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<InsuranceCoverageDoctor> doctors = query.getInsuranceCoverageDoctors(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("coverageDoctors", doctors);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/insuranceCoverageHospitals")
+  @GET
+  public Response insuranceCoverageHospitals(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<InsuranceCoverageHospital> companies = query.getInsuranceCoverageHospitals(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("coverageHospitals", companies);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/insuranceCompanies")
+  @GET
+  public Response insuranceCompanies(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<InsuranceCompany> companies = query.getInsuranceCompanies(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("insuranceCompanies", companies);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/healthClubs")
+  @GET
+  public Response healthClubs(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<HealthClub> clubs = query.getHealthClubs(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("healthClubs", clubs);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/hospitals")
+  @GET
+  public Response hospitals(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Hospital> hospitals = query.getHospitals(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("hospitals", hospitals);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/nutritionists")
+  @GET
+  public Response nutritionists(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Nutritionist> nutritionists = query.getNutritionists(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("nutritionists", nutritionists);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/nurses")
+  @GET
+  public Response nurses(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Nurse> nurses = query.getNurses(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("nurses", nurses);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/doctors")
+  @GET
+  public Response doctors(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Doctor> doctors = query.getDoctors(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("doctors", doctors);
+
+    return response(resp, format, callback);
   }
 
   /**
@@ -170,33 +355,14 @@ public class MyHealthService {
   @GET
   public Response dashboard(@QueryParam("format") final String format,
       @QueryParam("callback") final String callback) {
-    System.out.println("Dashboard request received\n\n");
+    LOGGER.info("Dashboard request received");
     Set<DashboardElement> dashboard = query.dashboard();
+    Map<String, Object> resp = new HashMap<String, Object>();
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("dashboard", dashboard);
 
-    Response response = null;
-    if (format != null && format.equals("xml")) {
-      XStream xStream = new XStream(new DomDriver());
-      xStream.alias("dashboard", java.util.Set.class);
-
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(xStream.toXML(dashboard)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/xml")
-            .entity(xStream.toXML(dashboard)).build();
-      }
-
-    } else {
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(new Gson().toJson(dashboard)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/json")
-            .entity(new Gson().toJson(dashboard)).build();
-      }
-    }
-
-    return response;
+    return response(resp, format, callback);
   }
 
   /**
@@ -209,33 +375,14 @@ public class MyHealthService {
   @GET
   public Response topics(@QueryParam("format") final String format,
       @QueryParam("callback") final String callback) {
-    System.out.println("Topics request received\n\n");
+    LOGGER.info("Topics request received");
     Set<Topic> topics = query.topics();
+    Map<String, Object> resp = new HashMap<String, Object>();
+    resp.put("code", 200);
+    resp.put("message", "Processing successfula");
+    resp.put("topics", topics);
 
-    Response response = null;
-    if (format != null && format.equals("xml")) {
-      XStream xStream = new XStream(new DomDriver());
-      xStream.alias("topics", java.util.Set.class);
-
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(xStream.toXML(topics)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/xml").entity(xStream.toXML(topics))
-            .build();
-      }
-
-    } else {
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(new Gson().toJson(topics)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/json")
-            .entity(new Gson().toJson(topics)).build();
-      }
-    }
-
-    return response;
+    return response(resp, format, callback);
   }
 
   /**
@@ -252,33 +399,46 @@ public class MyHealthService {
       @PathParam("offset") final int offset, @QueryParam("format") final String format,
       @QueryParam("callback") final String callback) {
 
-    System.out.println("Items request received\n\n");
+    LOGGER.info("Items request received");
     Set<Item> items = query.items(itemType, topicId, page, offset);
+    Map<String, Object> resp = new HashMap<String, Object>();
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("items", items);
 
-    Response response = null;
-    if (format != null && format.equals("xml")) {
-      XStream xStream = new XStream(new DomDriver());
-      xStream.alias("items", java.util.Set.class);
+    return response(resp, format, callback);
+  }
 
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(xStream.toXML(items)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/xml").entity(xStream.toXML(items))
-            .build();
-      }
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("/diseases/{keywords}")
+  @GET
+  public Response searchDisease() {
+    return Response.status(Status.OK).type("application/json").entity(new Gson().toJson(success()))
+        .build();
+  }
 
-    } else {
-      if (callback != null) {
-        response = Response.status(Status.OK).type("application/x-javascript")
-            .entity(new Gson().toJson(items)).build();
-      } else {
-        response = Response.status(Status.OK).type("application/json")
-            .entity(new Gson().toJson(items)).build();
-      }
-    }
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("/diseases/{diseaseId}/symptoms")
+  @GET
+  public Response getDiseaseSymptoms() {
+    return Response.status(Status.OK).type("application/json").entity(new Gson().toJson(success()))
+        .build();
+  }
 
-    return response;
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("/drugs/{keywords}")
+  @GET
+  public Response searchDrug() {
+    return Response.status(Status.OK).type("application/json").entity(new Gson().toJson(success()))
+        .build();
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Path("/drugs/{drugId}/sideEffects")
+  @GET
+  public Response getDrugSideEffects() {
+    return Response.status(Status.OK).type("application/json").entity(new Gson().toJson(success()))
+        .build();
   }
 
   /**
@@ -305,5 +465,32 @@ public class MyHealthService {
     failure.put("message", "Processing failed");
 
     return failure;
+  }
+
+  public Response response(Map<String, Object> resp, String format, String callback) {
+    Response response = null;
+    if (format != null && format.equals("xml")) {
+      XStream xStream = new XStream(new DomDriver());
+      xStream.alias("account", java.util.Map.class);
+
+      if (callback != null) {
+        response = Response.status(Status.OK).type("application/x-javascript")
+            .entity(xStream.toXML(resp)).build();
+      } else {
+        response = Response.status(Status.OK).type("application/xml").entity(xStream.toXML(resp))
+            .build();
+      }
+
+    } else {
+      if (callback != null) {
+        response = Response.status(Status.OK).type("application/x-javascript")
+            .entity(new Gson().toJson(resp)).build();
+      } else {
+        response = Response.status(Status.OK).type("application/json")
+            .entity(new Gson().toJson(resp)).build();
+      }
+    }
+
+    return response;
   }
 }
