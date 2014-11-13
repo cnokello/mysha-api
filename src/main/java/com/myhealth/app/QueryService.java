@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.myhealth.dao.MyHealthDAO;
+import com.myhealth.model.Answer;
+import com.myhealth.model.Article;
 import com.myhealth.model.DashboardElement;
 import com.myhealth.model.Disease;
 import com.myhealth.model.Doctor;
@@ -21,9 +23,11 @@ import com.myhealth.model.InsuranceCompany;
 import com.myhealth.model.InsuranceCoverageDoctor;
 import com.myhealth.model.InsuranceCoverageHospital;
 import com.myhealth.model.Item;
+import com.myhealth.model.MailMessage;
 import com.myhealth.model.Nurse;
 import com.myhealth.model.Nutritionist;
 import com.myhealth.model.PersonalTrainer;
+import com.myhealth.model.Post;
 import com.myhealth.model.Topic;
 import com.myhealth.model.User;
 import com.myhealth.model.UserAccess;
@@ -41,6 +45,46 @@ public class QueryService {
 
   private @Autowired
   MyHealthDAO myHealthDAO;
+
+  public Set<MailMessage> getMailMessages(long recipientId, int read) {
+    return myHealthDAO.getMailMessages(recipientId, read);
+  }
+
+  public Set<Answer> getAnswers(final long postId, final int page, final int offset) {
+    Set<Answer> answers = new HashSet<Answer>();
+    try {
+      answers = myHealthDAO.getAnswers(postId, page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return answers;
+  }
+
+  public Set<Post> getPosts(final int page, final int offset) {
+    Set<Post> posts = new HashSet<Post>();
+    try {
+      posts = myHealthDAO.getPosts(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return posts;
+  }
+
+  public Set<Article> getArticles(final int page, final int offset) {
+    Set<Article> articles = new HashSet<Article>();
+    try {
+      articles = myHealthDAO.getArticles(page, offset);
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    }
+
+    return articles;
+  }
 
   public Set<Disease> getDiseases(final int page, final int offset) {
     Set<Disease> diseases = new HashSet<Disease>();

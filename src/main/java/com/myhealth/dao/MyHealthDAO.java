@@ -12,6 +12,8 @@ import org.hibernate.SessionFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.myhealth.model.Answer;
+import com.myhealth.model.Article;
 import com.myhealth.model.DashboardElement;
 import com.myhealth.model.Disease;
 import com.myhealth.model.Doctor;
@@ -22,9 +24,11 @@ import com.myhealth.model.InsuranceCompany;
 import com.myhealth.model.InsuranceCoverageDoctor;
 import com.myhealth.model.InsuranceCoverageHospital;
 import com.myhealth.model.Item;
+import com.myhealth.model.MailMessage;
 import com.myhealth.model.Nurse;
 import com.myhealth.model.Nutritionist;
 import com.myhealth.model.PersonalTrainer;
+import com.myhealth.model.Post;
 import com.myhealth.model.Topic;
 import com.myhealth.model.User;
 
@@ -41,6 +45,116 @@ public class MyHealthDAO {
   SessionFactory sessionFactory;
 
   private static final Logger LOGGER = Logger.getLogger(MyHealthDAO.class);
+
+  public Set<MailMessage> getMailMessages(long recipientId, int read) {
+    Session session = null;
+    Set<MailMessage> msgs = new HashSet<MailMessage>();
+
+    try {
+      session = sessionFactory.openSession();
+      Query q = session
+          .createQuery("FROM MailMessage WHERE recipientId = :recipientId AND read = :read")
+          .setLong("recipientId", recipientId).setInteger("read", read);
+      msgs.addAll(q.list());
+
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    } finally {
+      if (session != null) {
+        try {
+          session.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+
+    return msgs;
+  }
+
+  public Set<Answer> getAnswers(long postId, final int page, final int offset) throws Exception {
+    Session session = null;
+    Set<Answer> answers = new HashSet<Answer>();
+
+    try {
+      session = sessionFactory.openSession();
+      Query q = session.createQuery("FROM Answer WHERE postId = :postId").setLong("postId", postId)
+          .setMaxResults(offset);
+      answers.addAll(q.list());
+
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %sn", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    } finally {
+      if (session != null) {
+        try {
+          session.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+
+    return answers;
+
+  }
+
+  public Set<Post> getPosts(final int page, final int offset) throws Exception {
+    Session session = null;
+    Set<Post> posts = new HashSet<Post>();
+
+    try {
+      session = sessionFactory.openSession();
+      Query q = session.createQuery("FROM Post").setMaxResults(offset);
+
+      posts.addAll(q.list());
+
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    } finally {
+      if (session != null) {
+        try {
+          session.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+
+    return posts;
+  }
+
+  public Set<Article> getArticles(final int page, final int offset) throws Exception {
+    Session session = null;
+    Set<Article> articles = new HashSet<Article>();
+
+    try {
+      session = sessionFactory.openSession();
+      Query q = session.createQuery("FROM Article").setMaxResults(offset);
+
+      List<Article> _articles = q.list();
+      for (Article _article : _articles) {
+        String tags = _article.getTagsString();
+        if (tags != null) {
+          _article.setTags(tags.split("#"));
+        }
+
+        articles.add(_article);
+      }
+
+    } catch (Exception e) {
+      LOGGER.error(String.format("Message: %s\nTrace: %s\n", e.getMessage(),
+          ExceptionUtils.getStackTrace(e)));
+    } finally {
+      if (session != null) {
+        try {
+          session.close();
+        } catch (Exception e) {
+        }
+      }
+    }
+
+    return articles;
+  }
 
   public Set<Disease> getDiseases(final int page, final int offset) throws Exception {
     Session session = null;

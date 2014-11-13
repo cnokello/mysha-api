@@ -1,6 +1,7 @@
 package com.myhealth.app;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -20,6 +21,8 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.google.gson.Gson;
+import com.myhealth.model.Answer;
+import com.myhealth.model.Article;
 import com.myhealth.model.DashboardElement;
 import com.myhealth.model.Disease;
 import com.myhealth.model.Doctor;
@@ -30,11 +33,14 @@ import com.myhealth.model.InsuranceCompany;
 import com.myhealth.model.InsuranceCoverageDoctor;
 import com.myhealth.model.InsuranceCoverageHospital;
 import com.myhealth.model.Item;
+import com.myhealth.model.MailMessage;
 import com.myhealth.model.Nurse;
 import com.myhealth.model.Nutritionist;
 import com.myhealth.model.PersonalTrainer;
+import com.myhealth.model.Post;
 import com.myhealth.model.Topic;
 import com.myhealth.model.User;
+import com.myhealth.model.Vote;
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.io.xml.DomDriver;
 
@@ -87,11 +93,6 @@ public class MyHealthService {
 
     resp.put("user", userDetails);
 
-    // Test Kafka
-    // persistenceService.createSocialNetworkAccount(u);
-
-    // Handle XML and Json formats
-    // If callback is specified
     return response(resp, format, callback);
   }
 
@@ -145,6 +146,126 @@ public class MyHealthService {
       resp.put("code", 201);
       resp.put("message", "User creation failed");
     }
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/mails")
+  @GET
+  public Response mails(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("recipientId") final Long recipientId, @QueryParam("read") final Integer read,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<MailMessage> msgs = query.getMailMessages(recipientId, read);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("messages", msgs);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/posts")
+  @GET
+  public Response posts(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Post> posts = query.getPosts(1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("posts", posts);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/createPost")
+  @GET
+  public Response createPost(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken, @QueryParam("userId") final Long userId,
+      @QueryParam("userFullName") final String userFullName,
+      @QueryParam("postType") final String postType, @QueryParam("postText") final String postText) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Post p = new Post(userId, userFullName, postText, postType);
+    persistenceService.createPost(p);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/vote")
+  @GET
+  public Response vote(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken, @QueryParam("userId") final Long userId,
+      @QueryParam("targetId") final Long targetId,
+      @QueryParam("targetType") final String targetType, @QueryParam("vote") final Integer vote) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Vote v = new Vote(userId, targetId, targetType, vote);
+    persistenceService.createVote(v);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/createPostAnswer")
+  @GET
+  public Response createPostAnswer(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken, @QueryParam("userId") final Long userId,
+      @QueryParam("userFullName") final String userFullName,
+      @QueryParam("answer") final String answer, @QueryParam("parentPostId") final Long parentPostId) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Answer a = new Answer(parentPostId, answer, userId);
+    persistenceService.createPostAnswer(a);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/articles")
+  @GET
+  public Response articles(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken, @QueryParam("postId") final Long postId) {
+
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Article> articles = new HashSet<Article>();
+    if (postId != null) {
+      articles = query.getArticles(1, 50);
+    } else {
+      articles = query.getArticles(1, 50);
+    }
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("articles", articles);
 
     return response(resp, format, callback);
   }
@@ -342,6 +463,23 @@ public class MyHealthService {
     resp.put("code", 200);
     resp.put("message", "Processing successful");
     resp.put("doctors", doctors);
+
+    return response(resp, format, callback);
+  }
+
+  @Produces({ "application/x-javascript", MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML })
+  @Consumes({ "application/javascript", "application/x-www-form-urlencoded" })
+  @Path("/answers")
+  @GET
+  public Response answers(@QueryParam("format") final String format,
+      @QueryParam("callback") final String callback,
+      @QueryParam("accessToken") final String accessToken, @QueryParam("postId") final Long postId) {
+    Map<String, Object> resp = new HashMap<String, Object>();
+    Set<Answer> answers = query.getAnswers(postId, 1, 50);
+
+    resp.put("code", 200);
+    resp.put("message", "Processing successful");
+    resp.put("answers", answers);
 
     return response(resp, format, callback);
   }
